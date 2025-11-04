@@ -1,0 +1,30 @@
+<ul>
+  <% if @automation_rule %>
+      <li>
+        <%= context_menu_link sprite_icon('bullet-go', l(:label_open_issues)),
+                              automation_rule_path(@automation_rule, project_id: params[:project_id]),
+                              class: Redmine::VERSION::MAJOR > 5 ? 'icon' : 'icon icon-arrow-right',
+                              disabled: !@can[:edit] %>
+      </li>
+      <li>
+        <%= context_menu_link sprite_icon('history', l(:label_automation_pipelines)),
+                              automation_pipelines_path(rule_id: @automation_rule, project_id: params[:project_id]),
+                              class: 'icon icon-history' %>
+      </li>
+      <li>
+        <%= context_menu_link sprite_icon('settings', l(:label_settings)),
+                              edit_automation_rule_path(@automation_rule, project_id: params[:project_id]),
+                              remote: true,
+                              class: 'icon icon-settings',
+                              disabled: !@can[:edit] %>
+      </li>
+      <li>
+        <%= context_menu_link sprite_icon('del', l(:button_delete)),
+                              automation_rule_path(@automation_rule, project_id: params[:project_id]),
+                              method: :delete,
+                              class: 'icon  icon-del',
+                              data: {confirm: l(:text_are_you_sure)},
+                              disabled: !@can[:delete] %>
+      </li>
+  <% end %>
+</ul>

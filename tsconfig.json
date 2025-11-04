@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+//    "strict": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./assets/javascripts",
+    "rootDir": "./frontend"
+  },
+  "include": ["frontend/**/*"],
+  "exclude": ["node_modules", "assets"]
+}

@@ -1,0 +1,2 @@
+$("#ajax-modal").html("<%= escape_javascript(render template: 'automation_rules/new', formats: [:html]) %>");
+showModal('ajax-modal', '70%', '<%= escape_javascript l(:label_new) %>');

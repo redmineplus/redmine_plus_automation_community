@@ -1,0 +1,36 @@
+<%= form_tag({}, data: {cm_url: context_menu_automation_rules_path}) do -%>
+  <%= hidden_field_tag 'back_url', url_for(params: request.query_parameters), id: nil %>
+  <%= hidden_field_tag 'project_id', params[:project_id] %>
+
+
+<div class="autoscroll">
+  <table class="list users">
+    <thead>
+    <tr>
+      <th></th>
+      <% @query.inline_columns.each do |column| %>
+        <%= column_header(@query, column) %>
+      <% end %>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <% @automation_rules.each do |entry| %>
+      <tr id="project-<%= entry.id %>" class="<%= cycle('odd', 'even') %> hascontextmenu ">
+        <td class="checkbox hide-when-print"><%= check_box_tag("ids[]", entry.id, false, :id => nil, :style => 'display:none;') %></td>
+        <% @query.inline_columns.each do |column| %>
+          <%= content_tag('td', automation_rule_column_value(column, entry), :class => column.css_classes) %>
+        <% end %>
+        <td class="buttons"><%= link_to_context_menu %></td>
+      </tr>
+
+    <% end -%>
+    </tbody>
+  </table>
+</div>
+<span class="pagination"><%= pagination_links_full @automation_rules_pages, @automation_rules_count %></span>
+
+<% end %>
+
+<%= context_menu %>

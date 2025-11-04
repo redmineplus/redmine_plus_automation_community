@@ -1,0 +1,15 @@
+<% if @automation_rule.editable? %>
+  <div class="contextual">
+    <%= link_to l(:label_automation_rules),
+                automation_rule_path(id: params[:rule_id], project_id: params[:project_id]),
+                class: "icon icon-show" %>
+  </div>
+<% end %>
+
+<%= title @automation_rule.name, l(:label_automation_pipelines) %>
+
+<% if @automation_pipelines.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+  <%= render partial: "list", locals: { entries: @automation_pipelines, project: @project }%>
+<% end %>

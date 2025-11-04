@@ -1,0 +1,58 @@
+{
+  "name": "redmine_plus_automation",
+  "version": "1.0.0",
+  "description": "= redmine_plus_automation",
+  "main": "index.jsx",
+  "type": "commonjs",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve",
+    "build": "webpack",
+    "lint": "npx eslint \"frontend/**/*.{ts,tsx}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "@eslint/js": "^9.14.0",
+    "@types/eslint__js": "^8.42.3",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.14.0",
+    "@typescript-eslint/parser": "^8.14.0",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "cypress": "^13.16.1",
+    "eslint": "^9.14.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sass-loader": "^16.0.3",
+    "style-loader": "^4.0.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.14.0",
+    "webpack": "^5.96.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "@babel/preset-typescript": "^7.26.0",
+    "@reduxjs/toolkit": "^2.4.0",
+    "axios": "^1.7.9",
+    "i18next": "^25.4.2",
+    "react-d3-tree": "^3.6.2",
+    "react-i18next": "^15.7.3",
+    "react-redux": "^9.1.2",
+    "react-select": "^5.8.3",
+    "react-tooltip": "^5.29.1",
+    "sass": "^1.81.0",
+    "yup": "^1.6.1"
+  }
+}

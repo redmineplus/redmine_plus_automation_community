@@ -1,0 +1,30 @@
+<% if @project ? User.current.allowed_to?(:manage_automation_rules, @project) : User.current.admin? %>
+  <div class="contextual">
+    <%= link_to l(:label_new),
+                new_automation_rule_path(project_id: params[:project_id]),
+                remote: true,
+                class: "icon icon-add" %>
+  </div>
+<% end %>
+
+<%= title l(:label_automation_rules) %>
+
+<%= form_tag({}, method: :get) do %>
+  <label for="name_like"><%= l(:label_search) %>:</label>
+  <%= text_field_tag "name_like", params[:name_like], size: 30 %>
+  <%= hidden_field_tag "project_id", params[:project_id] %>
+  <%= submit_tag l(:button_apply), class: "small", name_like: nil %>
+<% end %>
+
+<%= link_to l(:button_clear), automation_rules_path({project_id: params[:project_id]}), class: "icon icon-reload" %>
+
+<br/>
+<br/>
+
+
+<% if @automation_rules.empty? %>
+  <p class="nodata"><%= l(:label_no_data) %></p>
+<% else %>
+
+  <%= render partial: "list", locals: { entries: @automation_rules }%>
+<% end %>

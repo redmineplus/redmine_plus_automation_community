@@ -1,0 +1,305 @@
+# English strings go here for Rails i18n
+en:
+  field_automation_branch: "Branch"
+  field_automation_node: "Node"
+  field_automation_rule: "Rule"
+  field_automation_rules_visibility: Automation visibility
+  field_message: "Message"
+  label_automation_rules: "Automation"
+  label_automation_pipelines: "Pipelines"
+  label_automation_logs: "Logs"
+  field_enabled: "Enabled"
+  label_automation_rules_visibility_all: All automation rules
+  label_automation_rules_visibility_own: Automation rules created by the user
+  label_user_automation: "Automation User"
+  activerecord:
+    attributes:
+      automation_nodes:
+        branches:
+          for_each:
+            related_issues: "Related issues"
+  automation_nodes:
+    actions:
+      assign_issue:
+        title: "Assign issue"
+        description: "There are numerous ways to assign issues to users - from specifying the user, to copying from other issues and fields."
+        messages:
+          success: "Assigned %{assigned_to} to %{entity}"
+          failure_invalid: "Failed to assign %{assigned_to} to %{entity}: %{errors}"
+          failure_assign_method: "Invalid assign method: %{value}"
+          failure_assign_parent: "Parent issue not found for %{entity}"
+          failure_assign_type: "Invalid assign type: %{value}"
+          failure_user: "User not found with id %{value}"
+          failure_group: "Group not found with id %{value}"
+          failure_role: "Role not found with id %{value}"
+          failure_member: "No matching members."
+      clone_issue:
+        title: "Clone issue"
+        messages:
+          success: "Cloned issue %{created} from %{entity}"
+          failure_invalid: "Failed to clone %{entity} %{errors}"
+      create_issue:
+        title: "Create issue"
+        messages:
+          success: "Created issue %{created}"
+          failure_invalid: "Failed to create issue %{errors}"
+      comment_issue:
+        title: "Comment issue"
+        description: "Add a comment to the issue."
+        messages:
+          success: "Comment added to %{entity} %{comment}"
+          failure_invalid: "Failed to add comment to %{entity} %{errors}"
+      create_subtask:
+        title: "Create subtask"
+        messages:
+          success: "Created subtask %{created} for #{entity}"
+          failure: "Failed to create subtask for #{entity} %{errors}"
+      delete_issue:
+        title: "Delete issue"
+        messages:
+          success: "Deleted issue %{entity}"
+          failure_invalid: "Failed to delete issue %{errors}"
+      delete_issue_link:
+        title: "Delete issue links"
+        messages:
+          success: "Deleted issue links with types %{types} for %{entity}"
+          skipped: "No issue links with types %{types} found for %{entity}"
+          failure_invalid: "Failed to delete issue link %{errors}"
+      edit_comment:
+        title: "Edit comment"
+        messages:
+          success: "Comment edited to %{entity} %{comment}"
+          failure_invalid: "Failed to edit comment to %{entity} %{errors}"
+          failure_no_comments: "No comments found for %{entity}"
+      edit_issue:
+        title: "Edit issue"
+        messages:
+          success: "Edited %{entity}"
+          failure_invalid: "Failed to edit %{entity} %{errors}"
+      link_issue:
+        title: "Link issues"
+        messages:
+          success: "Linked issue %{from} to %{to}"
+          failure_invalid: "Failed to link issue %{errors}"
+          failure_created: "No issue was created in previous action"
+          failure_issue: "Issue field was not set properly"
+      log_work:
+        title: "Spent time"
+        description: "Log spent time on the issue."
+        messages:
+          success: "Logged %{time} on %{entity}"
+          failure_invalid: "Failed to log spent time %{errors}"
+      manage_watchers:
+        title: "Manage watchers"
+        description: "Add or remove watchers from the issue."
+        messages:
+          success: "Added: %{added}, removed: %{removed}, watchers to %{entity}"
+      send_email:
+        title: "Send email"
+        description: "Send an email to a specified recipient."
+        messages:
+          success: "Email sent successfully to %{to} with subject: %{subject}"
+          failure: "Failed to send email to %{to}: %{errors}"
+          failure_email_format: "Invalid email format: %{value}"
+          failure_user: "User not found with id %{value}"
+          failure_group: "Group not found with id %{value}"
+          failure_custom_field: "Custom field not found with id %{value}"
+      send_web_request:
+        title: "Send web request"
+        description: "Send a web request to a specified URL."
+        messages:
+          success: "Web request sent successfully to %{url} with response: %{response}"
+          failure_web_request: "Web request failed with error: %{error}"
+    triggers:
+      messages:
+        success: "%{entity}"
+    conditions:
+      query:
+        title: "Issue filters condition"
+        description: "Checks whether an issue's field meets a certain criteria."
+        messages:
+          success: "The following issue passed: %{entity}"
+          skipped: "The following issue did not pass: %{entity}"
+          failure_field: "Field %{filter_name} is missing on IssueQuery"
+          failure_config: "Ensure condition is configured correctly"
+    branches:
+      for_each:
+        title: "Branch rule / related issues"
+        description: "Please select which related issue you would like to perform actions against."
+        fields:
+          related_issues:
+            label: "Related issues"
+            options:
+              created: "Created issue"
+              current: "Current issue"
+              linked: "Linked issue"
+              parent: "Parent issue"
+              subtasks: "Subtasks"
+        messages:
+          success: "Branch pipeline scheduled for #{related}: %{entity}"
+          success_blank: "No %{related} found for %{entity}"
+          failure_related: "Unknown related issues type"
+  automation_tokens:
+    issue:
+      id: Issue ID
+      subject: Issue subject
+      description: Issue description
+      estimated_hours: Issue estimated hours
+      is_private: Issue is private
+      done_ratio: Issue done ratio
+      start_date: Issue start date
+      due_date: Issue due date
+      created_on: Issue created date
+      updated_on: Issue updated date
+      closed_on: Issue closed date
+      url: Issue URL
+      project:
+        id: Issue project ID
+        name: Issue project name
+        description: Issue project description
+        identifier: Issue project identifier
+        is_public: Issue project public
+        status: Issue project status
+        created_on: Issue project created date
+        updated_on: Issue project updated date
+        url: Project URL
+      author:
+        id: Issue author ID
+        login: Issue author login
+        name: Issue author name
+        firstname: Issue author first name
+        lastname: Issue author last name
+        admin: Issue author admin
+        status: Issue author status
+        mail: Issue author mail
+        language: Issue author language
+        created_on: Issue author created date
+        updated_on: Issue author updated date
+        last_login_on: Issue author last login date
+        url: Author URL
+      assigned_to:
+        id: Issue assignee ID
+        login: Issue assignee login
+        name: Issue assignee name
+        firstname: Issue assignee first name
+        lastname: Issue assignee last name
+        admin: Issue assignee admin
+        status: Issue assignee status
+        mail: Issue assignee mail
+        language: Issue assignee language
+        created_on: Issue assignee created date
+        updated_on: Issue assignee updated date
+        last_login_on: Issue assignee last login date
+        url: Assignee URL
+      parent:
+        id: Issue parent ID
+        subject: Issue parent subject
+        description: Issue parent description
+        estimated_hours: Issue parent estimated hours
+        is_private: Issue parent is private
+        done_ratio: Issue parent done ratio
+        start_date: Issue parent start date
+        due_date: Issue parent due date
+        created_on: Issue parent created date
+        updated_on: Issue parent updated date
+        closed_on: Issue parent closed date
+        url: Issue parent URL
+      root:
+        id: Issue root ID
+        subject: Issue root subject
+        description: Issue root description
+        estimated_hours: Issue root estimated hours
+        is_private: Issue root is private
+        done_ratio: Issue root done ratio
+        start_date: Issue root start date
+        due_date: Issue root due date
+        created_on: Issue root created date
+        updated_on: Issue root updated date
+        closed_on: Issue root closed date
+        url: Issue root URL
+      status:
+        id: Issue status ID
+        name: Issue status name
+        description: Issue status description
+        is_closed: Issue status is closed
+        url: Issue status URL
+      priority:
+        id: Issue priority ID
+        name: Issue priority name
+        is_default: Issue priority is default
+        active: Issue priority active
+        url: Issue priority URL
+      category:
+        id: Issue category ID
+        name: Issue category name
+        url: Issue category URL
+      tracker:
+        id: Issue tracker ID
+        name: Issue tracker name
+        description: Issue tracker description
+        url: Issue tracker URL
+      fixed_version:
+        id: Issue version ID
+        name: Issue version name
+        description: Issue version description
+        effective_date: Issue version effective date
+        created_on: Issue version created date
+        updated_on: Issue version updated date
+        status: Issue version status
+        sharing: Issue version sharing
+        url: Issue version URL
+      first_comment:
+        id: First comment ID
+        notes: First comment notes
+        private_notes: First comment private notes
+        created_on: First comment created date
+        updated_on: First comment updated date
+      last_comment:
+        id: Last comment ID
+        notes: Last comment notes
+        private_notes: Last comment private notes
+        created_on: Last comment created date
+        updated_on: Last comment updated date
+    initiator:
+      id: Initiator ID
+      login: Initiator login
+      name: Initiator name
+      firstname: Initiator first name
+      lastname: Initiator last name
+      admin: Initiator admin
+      status: Initiator status
+      mail: Initiator mail
+      language: Initiator language
+      created_on: Initiator created date
+      updated_on: Initiator updated date
+      last_login_on: Initiator last login date
+      url: Initiator URL
+    now:
+      now: Now
+      sec: Now's seconds
+      min: Now's minutes
+      hour: Now's hours
+      day: Now's day
+      month: Now's month
+      year: Now's year
+      plus_days: Now plus X days
+      plus_weeks: Now plus X weeks
+      plus_months: Now plus X months
+      plus_years: Now plus X years
+      minus_days: Now minus X days
+      minus_weeks: Now minus X weeks
+      minus_months: Now minus X months
+      minus_years: Now minus X years
+    today:
+      today: Today
+      day: Today's day
+      month: Today's month
+      year: Today's year
+      plus_days: Today plus X days
+      plus_weeks: Today plus X weeks
+      plus_months: Today plus X months
+      plus_years: Today plus X years
+      minus_days: Today minus X days
+      minus_weeks: Today minus X weeks
+      minus_months: Today minus X months
+      minus_years: Today minus X years

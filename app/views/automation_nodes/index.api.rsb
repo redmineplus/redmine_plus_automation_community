@@ -1,0 +1,15 @@
+api.array :automation_nodes do
+  @automation_nodes.each do |automation_node|
+    api.automation_node do
+      api.id automation_node.id
+      api.uuid automation_node.uuid
+      api.name automation_node.name
+      api.description automation_node.description
+      api.position automation_node.position
+      api.type automation_node.mapping_type
+      api.nodeType automation_node.node_type
+      api.parentNodeUuid automation_node.parent_node_uuid
+      api.metadata automation_node.metadata
+    end
+  end
+end

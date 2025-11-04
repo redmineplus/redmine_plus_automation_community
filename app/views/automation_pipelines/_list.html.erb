@@ -1,0 +1,30 @@
+<div class="autoscroll">
+  <table class="list users">
+    <thead>
+    <tr>
+      <th></th>
+      <% @query.inline_columns.each do |column| %>
+        <%= column_header(@query, column) %>
+      <% end %>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+
+    <% @automation_pipelines.each do |entry| %>
+      <tr id="project-<%= entry.id %>" class="<%= cycle('odd', 'even') %> hascontextmenu ">
+        <td class="checkbox hide-when-print"><%= check_box_tag("ids[]", entry.id, false, :id => nil, :style => 'display:none;') %></td>
+        <% @query.inline_columns.each do |column| %>
+          <%= content_tag('td', automation_pipeline_column_value(column, entry), :class => column.css_classes) %>
+        <% end %>
+        <td class="buttons">
+          <%= link_to l(:label_automation_logs), automation_logs_path(pipeline_id: entry, project_id: project), class: 'icon icon-logs' %>
+        </td>
+      </tr>
+
+    <% end -%>
+    </tbody>
+  </table>
+</div>
+
+<span class="pagination"><%= pagination_links_full @automation_pipelines_pages, @automation_pipelines_count %></span>

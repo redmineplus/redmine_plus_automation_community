@@ -1,0 +1,4 @@
+<%= labelled_form_for :automation_rule, @automation_rule, url: automation_rule_path(project_id: params[:project_id]), html: {multipart: true, id: 'automation_rule_form'} do |f|  %>
+    <%= render partial: 'form', locals: {f: f} %>
+    <%= submit_tag l(:button_update), testid: "submit-automation" %>
+<% end %>

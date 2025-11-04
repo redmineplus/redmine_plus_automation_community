@@ -1,0 +1,95 @@
+redmine_6_e2e_tests:
+  stage: Redmine 6 E2E
+  script:
+    - echo "Starting MySQL 8..."
+    - docker network create redmine-network
+    - |
+      docker run -d --name mysql --network redmine-network \
+        -e MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD}" \
+        -e MYSQL_DATABASE="${MYSQL_DATABASE}" \
+        -e MYSQL_USER="${MYSQL_USER}" \
+        -e MYSQL_PASSWORD="${MYSQL_PASSWORD}" \
+        -p 3307:3306 mysql:8
+
+    - echo "Waiting for MySQL to be ready..."
+    - until docker exec mysql mysqladmin ping -h"localhost" --silent; do sleep 2; done
+
+    - echo "Starting Redmine..."
+    - |
+      docker run -d --name redmine --network redmine-network -p 3000:3000 \
+        -e REDMINE_DB_ADAPTER="${REDMINE_DB_ADAPTER}" \
+        -e REDMINE_DB_HOST="${REDMINE_DB_HOST}" \
+        -e REDMINE_DB_PORT="${REDMINE_DB_PORT}" \
+        -e REDMINE_DB_DATABASE="${REDMINE_DB_DATABASE}" \
+        -e REDMINE_DB_USERNAME="${REDMINE_DB_USERNAME}" \
+        -e REDMINE_DB_PASSWORD="${REDMINE_DB_PASSWORD}" \
+        -e REDMINE_SECRET_KEY_BASE="${REDMINE_SECRET_KEY_BASE}" \
+        -e SECRET_KEY_BASE="${REDMINE_SECRET_KEY_BASE}" \
+        redmine:6.0.6
+
+    - sleep 10
+
+    # Install curl (needed to download Node.js)
+    - echo "Installing curl..."
+    - docker exec redmine bash -c "apt-get update && apt-get install -y curl"
+
+    # Install required dependencies for Cypress
+    - echo "Installing required system libraries..."
+    - docker exec redmine bash -c "apt-get update && apt-get install -y libnss3 libgtk-3-0 libgbm-dev libasound2 libatk-bridge2.0-0 libxcomposite1 libxrandr2 libxdamage1 libxi6 libxcursor1 libxss1 libxtst6 libz-dev build-essential gcc g++ make"
+
+    # Clone the current repository (using CI_PROJECT_DIR)
+    - echo "Cloning the current repository..."
+    - cp -R $CI_PROJECT_DIR /tmp/redmine_plus_automation_community
+
+    # Ensure the plugins directory exists in the Redmine container
+    - echo "Creating plugins directory in Redmine container..."
+    - docker exec redmine mkdir -p /usr/src/redmine/plugins
+
+    # Copy the cloned repository into the Redmine container's plugin folder
+    - echo "Copying plugin to Redmine container..."
+    - docker cp /tmp/redmine_plus_automation_community redmine:$PLUGIN_DIR
+
+    #    # Install Redmine dependencies
+    #    - echo "Installing Redmine dependencies..."
+    #    - docker exec redmine bash -c "cd /usr/src/redmine && bundle install"
+
+    # Restart Redmine to apply changes
+    - echo "Bundle install and migrations..."
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle install"
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
+    - docker restart redmine
+    #    - docker exec redmine bash -c "cd /usr/src/redmine && touch /tmp/restart.txt"
+
+    - echo "Waiting for Redmine to start..."
+    - sleep 10  # Allow Redmine time to initialize
+
+    # Install Node.js
+    - echo "Installing Node.js 20..."
+    - docker exec redmine bash -c "curl -sL https://deb.nodesource.com/setup_20.x | bash -"
+    - docker exec redmine bash -c "apt-get install -y nodejs"
+    - docker exec redmine bash -c "node -v"  # Verify the installed Node.js version
+
+    # Install Xvfb for Cypress
+    - echo "Installing Xvfb..."
+    - docker exec redmine bash -c "apt-get update && apt-get install -y xvfb"
+
+    # Seed the database
+    - echo "Seeding the database..."
+
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'User.create!(login:\"test\", password:\"12345678\", admin:true, firstname:\"Test\", lastname:\"User\", mail:\"test@test.com\")'"
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'project = Project.create!(name:\"Test Project 1\", identifier:\"test-project-1\", trackers:Tracker.all); project.enable_module!(\"automation_rules\")'"
+    - docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'project = Project.create!(name:\"Test Project 2\", identifier:\"test-project-2\", trackers:Tracker.all); project.enable_module!(\"automation_rules\")'"
+
+    # Run Cypress tests
+    - echo "Running Cypress tests..."
+    - docker exec redmine bash -c "export DISPLAY=:99 && Xvfb :99 -screen 0 1920x1080x24 &"
+    - docker exec redmine bash -c "cd /usr/src/redmine/plugins/redmine_plus_automation_community && npm install"
+    - docker exec redmine bash -c "cd /usr/src/redmine/plugins/redmine_plus_automation_community && npx cypress run --e2e"
+
+  after_script:
+    - echo "Cleaning up..."
+    - docker stop redmine mysql || true
+    - docker rm redmine mysql || true
+    - docker network rm redmine-network || true
+    - rm -rf /tmp/redmine_plus_automation_community

@@ -1,0 +1,23 @@
+<% script_url = javascript_include_tag('issues_dropdown_bundle', plugin: :redmine_plus_automation_community)
+
+   bundle_url = Nokogiri::HTML.fragment(script_url).at('script')['src']
+%>
+
+<%= javascript_tag do %>
+  $(document).ready(function() {
+     document.querySelectorAll('#content > .contextual').forEach(contextual => {
+       const container = document.createElement('span');
+       container.className = 'redmineAutomationDropdown';
+       container.setAttribute('data-issue-id', '<%= @issue.id %>');
+       contextual.prepend(container);
+     });
+
+    var script = document.createElement('script');
+    script.src = '<%= bundle_url %>'
+    document.body.appendChild(script);
+  });
+<% end %>
+
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag "redmine_automation.css", plugin: "redmine_plus_automation_community", media: "print" %>
+<% end %>
