@@ -43,7 +43,7 @@ To install the Redmine Plus Automation Community plugin, follow these steps:
    ```
 4. Restart your Redmine server.
 
-For more detailed installation instructions, please refer to the [official documentation](hhttps://redmineplus.com/how-to-install-redmine-automation-plugin/).
+For more detailed installation instructions, please refer to the [official documentation](https://redmineplus.com/how-to-install-redmine-automation-plugin/).
 
 Usage
 -----
