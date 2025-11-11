@@ -162,7 +162,6 @@ jobs:
             libxss1 libxtst6 libxdamage1 libxcomposite1 \
             libxrandr2 libxi6 libxcursor1 libxkbcommon0 \
             libgtk-3-0 libnss3"
-          node -v
 
       - name: Install plugin + migrate
         run: |
