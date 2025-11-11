@@ -171,7 +171,10 @@ jobs:
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
           docker restart redmine
-          sleep 10
+          
+      - name: Wait for Redmine to be ready
+        run: |
+          until curl -s http://localhost:3000 >/dev/null; do sleep 2; done
 
       - name: Seed DB
         run: |
