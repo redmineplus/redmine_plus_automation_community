@@ -22,8 +22,10 @@ env:
 
 jobs:
 
+  # =============================================================================
+  # RSpec – Redmine 5
+  # =============================================================================
   redmine5_rspec:
-    name: Redmine 5 - RSpec
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -62,7 +64,7 @@ jobs:
             redmine:5.1.6
           sleep 20
 
-      - name: Install deps in Redmine
+      - name: Install dependencies
         run: docker exec redmine bash -c "apt-get update && apt-get install -y curl build-essential gcc g++ make libnss3 libgtk-3-0"
 
       - name: Copy plugin
@@ -72,15 +74,22 @@ jobs:
 
       - name: Run RSpec
         run: |
-          mkdir -p artifacts
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle install --with development test" > artifacts/bundle_install.log 2>&1
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=test" > artifacts/migrate.log 2>&1
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rspec -Iplugins/redmine_plus_automation_community/spec plugins/redmine_plus_automation_community/spec" > artifacts/rspec.log 2>&1
+          mkdir -p artifacts/rspec
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle install --with development test" > artifacts/rspec/bundle_install.log 2>&1
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=test" > artifacts/rspec/migrate.log 2>&1
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rspec -Iplugins/redmine_plus_automation_community/spec plugins/redmine_plus_automation_community/spec" > artifacts/rspec/rspec.log 2>&1
+
+      - name: Collect Redmine Logs
+        if: always()
+        run: |
+          mkdir -p artifacts/redmine_logs
+          docker cp redmine:/usr/src/redmine/log artifacts/redmine_logs || true
+          docker logs redmine > artifacts/redmine_logs/docker_redmine.log 2>&1 || true
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rspec-redmine5-logs
+          name: redmine5-rspec-artifacts
           path: artifacts
 
       - name: Cleanup
@@ -88,8 +97,10 @@ jobs:
         run: docker stop redmine mysql || true && docker rm redmine mysql || true && docker network rm redmine-network || true
 
 
+  # =============================================================================
+  # RSpec – Redmine 6
+  # =============================================================================
   redmine6_rspec:
-    name: Redmine 6 - RSpec
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
@@ -103,36 +114,56 @@ jobs:
 
       - name: Run RSpec in Redmine 6
         run: |
-          mkdir -p artifacts
+          mkdir -p artifacts/rspec
           docker network create redmine-network
           docker run -d --name mysql --network redmine-network \
-            -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=redmine -e MYSQL_USER=redmine -e MYSQL_PASSWORD=redmine \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=redmine \
+            -e MYSQL_USER=redmine \
+            -e MYSQL_PASSWORD=redmine \
             -p 3307:3306 mysql:8
           until docker exec mysql mysqladmin ping -hlocalhost --silent; do sleep 2; done
+
           docker run -d --name redmine --network redmine-network -p 3000:3000 \
             -e RAILS_ENV=test \
             redmine:6.0.6
           sleep 20
+
           docker exec redmine bash -c "apt-get update && apt-get install -y curl build-essential gcc g++ make libnss3 libgtk-3-0"
           docker exec redmine mkdir -p /usr/src/redmine/plugins
           docker cp . redmine:/usr/src/redmine/plugins/redmine_plus_automation_community
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle install --with development test" > artifacts/bundle_install.log 2>&1
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=test" > artifacts/migrate.log 2>&1
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rspec -Iplugins/redmine_plus_automation_community/spec plugins/redmine_plus_automation_community/spec" > artifacts/rspec.log 2>&1
+          
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle install --with development test" > artifacts/rspec/bundle_install.log 2>&1
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=test" > artifacts/rspec/migrate.log 2>&1
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rspec -Iplugins/redmine_plus_automation_community/spec plugins/redmine_plus_automation_community/spec" > artifacts/rspec/rspec.log 2>&1
+
+      - name: Collect Redmine Logs
+        if: always()
+        run: |
+          mkdir -p artifacts/redmine_logs
+          docker cp redmine:/usr/src/redmine/log artifacts/redmine_logs || true
+          docker logs redmine > artifacts/redmine_logs/docker_redmine.log 2>&1 || true
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: rspec-redmine6-logs
+          name: redmine6-rspec-artifacts
           path: artifacts
 
+      - name: Cleanup
+        if: always()
+        run: docker stop redmine mysql || true && docker rm redmine mysql || true && docker network rm redmine-network || true
 
+
+  # =============================================================================
+  # Cypress E2E (Redmine 5 + 6)
+  # =============================================================================
   e2e:
-    name: Redmine E2E (Cypress)
     runs-on: ubuntu-latest
     container:
       image: docker:24.0.5-dind
       options: --privileged
+
     strategy:
       matrix:
         redmine_version: [5.1.6, 6.0.6]
@@ -147,14 +178,18 @@ jobs:
         run: |
           docker network create redmine-network
           docker run -d --name mysql --network redmine-network \
-            -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=redmine -e MYSQL_USER=redmine -e MYSQL_PASSWORD=redmine \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=redmine \
+            -e MYSQL_USER=redmine \
+            -e MYSQL_PASSWORD=redmine \
             -p 3307:3306 mysql:8
           until docker exec mysql mysqladmin ping -hlocalhost --silent; do sleep 2; done
+
           docker run -d --name redmine --network redmine-network -p 3000:3000 \
             redmine:${{ matrix.redmine_version }}
           sleep 25
 
-      - name: Install Cypress system dependencies
+      - name: Install Cypress dependencies
         run: |
           docker exec redmine bash -c "apt-get update && apt-get install -y \
             curl xvfb nodejs npm \
@@ -163,7 +198,7 @@ jobs:
             libxrandr2 libxi6 libxcursor1 libxkbcommon0 \
             libgtk-3-0 libnss3"
 
-      - name: Install plugin + migrate
+      - name: Install plugin + migrate + restart
         run: |
           docker exec redmine mkdir -p /usr/src/redmine/plugins
           docker cp . redmine:/usr/src/redmine/plugins/redmine_plus_automation_community
@@ -171,10 +206,7 @@ jobs:
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
           docker restart redmine
-
-      - name: Wait for Redmine to be ready
-        run: |
-          sleep 10
+          sleep 15
 
       - name: Seed DB
         run: |
@@ -182,7 +214,7 @@ jobs:
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'p1 = Project.create!(name:\"Test Project 1\", identifier:\"test-project-1\", trackers: Tracker.all); p1.enable_module!(\"automation_rules\")'"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'p2 = Project.create!(name:\"Test Project 2\", identifier:\"test-project-2\", trackers: Tracker.all); p2.enable_module!(\"automation_rules\")'"
 
-      - name: Run Cypress tests
+      - name: Run Cypress
         run: |
           mkdir -p artifacts/cypress
           docker exec redmine bash -c "export DISPLAY=:99 && Xvfb :99 -screen 0 1920x1080x24 &"
@@ -190,11 +222,18 @@ jobs:
           docker cp redmine:/usr/src/redmine/plugins/redmine_plus_automation_community/cypress/videos artifacts/cypress/videos || true
           docker cp redmine:/usr/src/redmine/plugins/redmine_plus_automation_community/cypress/screenshots artifacts/cypress/screenshots || true
 
+      - name: Collect Redmine Logs
+        if: always()
+        run: |
+          mkdir -p artifacts/redmine_logs
+          docker cp redmine:/usr/src/redmine/log artifacts/redmine_logs || true
+          docker logs redmine > artifacts/redmine_logs/docker_redmine.log 2>&1 || true
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: cypress-redmine${{ matrix.redmine_version }}-artifacts
-          path: artifacts/cypress
+          name: cypress-redmine-${{ matrix.redmine_version }}-artifacts
+          path: artifacts
 
       - name: Cleanup
         if: always()
