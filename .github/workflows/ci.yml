@@ -158,9 +158,10 @@ jobs:
         run: |
           docker exec redmine bash -c "apt-get update && apt-get install -y \
             curl xvfb nodejs npm \
-            libasound2 libatk-bridge2.0-0 libgbm1 libxshmfence1 libxss1 \
-            libxtst6 libxdamage1 libxcomposite1 libxrandr2 libxi6 libxcursor1 \
-            libxkbcommon0 libgtk-3-0 libnss3"
+            libasound2 libatk-bridge2.0-0 libgbm1 libxshmfence1 \
+            libxss1 libxtst6 libxdamage1 libxcomposite1 \
+            libxrandr2 libxi6 libxcursor1 libxkbcommon0 \
+            libgtk-3-0 libnss3"
 
       - name: Install plugin + migrate
         run: |
@@ -169,11 +170,14 @@ jobs:
           docker exec redmine bash -c "cd /usr/src/redmine && bundle install"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
+          docker restart redmine
+          sleep 10
 
-      - name: Seed DB for tests
+      - name: Seed DB
         run: |
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'User.create!(login:\"test\", password:\"12345678\", admin:true, firstname:\"Test\", lastname:\"User\", mail:\"test@test.com\")'"
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'project = Project.create!(name:\"Test\", identifier:\"test\", trackers:Tracker.all); project.enable_module!(\"automation_rules\")'"
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'p1 = Project.create!(name:\"Test Project 1\", identifier:\"test-project-1\", trackers: Tracker.all); p1.enable_module!(\"automation_rules\")'"
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rails runner -e production 'p2 = Project.create!(name:\"Test Project 2\", identifier:\"test-project-2\", trackers: Tracker.all); p2.enable_module!(\"automation_rules\")'"
 
       - name: Run Cypress tests
         run: |
