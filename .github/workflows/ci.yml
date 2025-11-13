@@ -191,7 +191,7 @@ jobs:
             -e REDMINE_SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE \
             -e SECRET_KEY_BASE=$REDMINE_SECRET_KEY_BASE \
             redmine:${{ matrix.redmine_version }}
-          sleep 25
+          sleep 15
 
       - name: Install Cypress system dependencies
         run: |
@@ -205,12 +205,13 @@ jobs:
       - name: Install Plugin & Migrate & Restart
         run: |
           docker exec redmine mkdir -p /usr/src/redmine/plugins
-          docker cp . redmine:$PLUGIN_DIR
+          docker cp . redmine:/usr/src/redmine/plugins/redmine_plus_automation_community
           docker exec redmine bash -c "cd /usr/src/redmine && bundle install"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
+          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:assets RAILS_ENV=production"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
           docker restart redmine
-          sleep 15
+          sleep 10
 
       - name: Seed DB
         run: |
