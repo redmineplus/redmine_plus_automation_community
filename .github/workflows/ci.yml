@@ -205,10 +205,9 @@ jobs:
       - name: Install Plugin & Migrate & Restart
         run: |
           docker exec redmine mkdir -p /usr/src/redmine/plugins
-          docker cp . redmine:/usr/src/redmine/plugins/redmine_plus_automation_community
+          docker cp . redmine:$PLUGIN_DIR
           docker exec redmine bash -c "cd /usr/src/redmine && bundle install"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:migrate RAILS_ENV=production"
-          docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:plugins:assets RAILS_ENV=production"
           docker exec redmine bash -c "cd /usr/src/redmine && bundle exec rake redmine:load_default_data REDMINE_LANG=en RAILS_ENV=production"
           docker restart redmine
           sleep 10
@@ -232,6 +231,7 @@ jobs:
         run: |
           mkdir -p artifacts/redmine_logs
           docker cp redmine:/usr/src/redmine/log artifacts/redmine_logs || true
+          docker cp redmine:/usr/src/redmine/plugins/redmine_plus_automation_community/cypress/screenshots artifacts/cypress/screenshots || true
           docker logs redmine > artifacts/redmine_logs/docker_redmine.log || true
 
       - uses: actions/upload-artifact@v4
