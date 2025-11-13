@@ -181,7 +181,6 @@ jobs:
           until docker exec mysql mysqladmin ping -hlocalhost --silent; do sleep 2; done
 
           docker run -d --name redmine --network redmine-network -p 3000:3000 \
-            -e RAILS_ENV=production \
             -e REDMINE_DB_ADAPTER=$REDMINE_DB_ADAPTER \
             -e REDMINE_DB_HOST=$REDMINE_DB_HOST \
             -e REDMINE_DB_PORT=$REDMINE_DB_PORT \
