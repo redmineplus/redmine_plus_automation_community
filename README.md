@@ -1,4 +1,4 @@
-Redmine Plus Automation Community
+Redmine Plus Automation
 ===================================
 
 Redmine Plus Automation Community is a plugin for Redmine that enhances automation capabilities within the Redmine project management system. It provides additional features and tools to streamline workflows, automate repetitive tasks, and improve overall productivity for teams using Redmine.
