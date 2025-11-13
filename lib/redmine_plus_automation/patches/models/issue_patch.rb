@@ -15,6 +15,8 @@ module RedminePlusAutomation
         end
 
         module InstanceMethods
+          TRIGGER_FIELDS = %w[tracker_id project_id subject description due_date category_id status_id assigned_to_id priority_id
+                                 fixed_version_id start_date done_ratio estimated_hours parent_id is_private closed_on].freeze
 
           private
 
@@ -23,6 +25,8 @@ module RedminePlusAutomation
           end
 
           def automation_trigger_updated
+            return unless (previous_changes.keys & TRIGGER_FIELDS).any?
+
             ::AutomationNodes::Triggers::IssueUpdated.trigger!(self)
             ::AutomationNodes::Triggers::ValueChanged.trigger!(self)
           end
