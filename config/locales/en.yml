@@ -53,7 +53,7 @@ en:
         title: "Create subtask"
         messages:
           success: "Created subtask %{created} for #{entity}"
-          failure: "Failed to create subtask for #{entity} %{errors}"
+          failure_invalid: "Failed to create subtask for #{entity} %{errors}"
       delete_issue:
         title: "Delete issue"
         messages:
