@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with redmine_plus_automation. If not, see <http://www.gnu.org/licenses/>.
 
-Redmine::Plugin.register :redmine_plus_automation_community do
+Redmine::Plugin.register :redmine_plus_automation do
   name 'Redmine Plus Automation plugin'
   author 'Redmine plus'
   description 'This is an automation plugin for Redmine'

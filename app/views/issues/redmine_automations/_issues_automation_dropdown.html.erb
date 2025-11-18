@@ -1,4 +1,4 @@
-<% script_url = javascript_include_tag('issues_dropdown_bundle', plugin: :redmine_plus_automation_community)
+<% script_url = javascript_include_tag('issues_dropdown_bundle', plugin: :redmine_plus_automation)
 
    bundle_url = Nokogiri::HTML.fragment(script_url).at('script')['src']
 %>
@@ -19,5 +19,5 @@
 <% end %>
 
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag "redmine_automation.css", plugin: "redmine_plus_automation_community", media: "print" %>
+  <%= stylesheet_link_tag "redmine_automation.css", plugin: "redmine_plus_automation", media: "print" %>
 <% end %>
